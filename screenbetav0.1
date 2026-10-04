@@ -1,0 +1,310 @@
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+local IMAGE_URL = "https://github.com/CoolCatUserRebornV2/loadingSCREEN/raw/refs/heads/main/IMG_0500.jpeg"
+local IMAGE_FILE = "krystal_loading.jpeg"
+
+if not isfile(IMAGE_FILE) then
+    writefile(IMAGE_FILE, game:HttpGet(IMAGE_URL))
+end
+
+local IMAGE_ASSET = getcustomasset(IMAGE_FILE)
+
+local old = PlayerGui:FindFirstChild("KrystalDanceLoadingScreen")
+if old then
+    old:Destroy()
+end
+
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "KrystalDanceLoadingScreen"
+Gui.IgnoreGuiInset = true
+Gui.ResetOnSpawn = false
+Gui.DisplayOrder = 999999
+Gui.Parent = PlayerGui
+
+local Background = Instance.new("Frame")
+Background.Size = UDim2.fromScale(1, 1)
+Background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Background.BorderSizePixel = 0
+Background.Parent = Gui
+
+local Image = Instance.new("ImageLabel")
+Image.Name = "Image"
+Image.AnchorPoint = Vector2.new(0.5, 0.5)
+Image.Position = UDim2.fromScale(0.5, 0.5)
+Image.Size = UDim2.fromOffset(850, 850)
+Image.BackgroundTransparency = 1
+Image.Image = IMAGE_ASSET
+Image.ScaleType = Enum.ScaleType.Fit
+Image.Parent = Background
+
+local Ring = Instance.new("Frame")
+Ring.Name = "SaturnRing"
+Ring.AnchorPoint = Vector2.new(0.5, 0.5)
+Ring.Position = UDim2.fromScale(0.5, 0.5)
+Ring.Size = UDim2.fromOffset(1050, 300)
+Ring.BackgroundTransparency = 1
+Ring.Parent = Background
+
+local RingCorner = Instance.new("UICorner")
+RingCorner.CornerRadius = UDim.new(1, 0)
+RingCorner.Parent = Ring
+
+local RingStroke = Instance.new("UIStroke")
+RingStroke.Thickness = 12
+RingStroke.Transparency = 0.05
+RingStroke.Color = Color3.fromRGB(255, 215, 0)
+RingStroke.Parent = Ring
+
+local RingGradient = Instance.new("UIGradient")
+RingGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 180, 0)),
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 120)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(255, 210, 0)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(255, 240, 80)),
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(255, 170, 0)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 230, 40))
+})
+RingGradient.Parent = Ring
+
+local RingRotationConnection
+
+RingRotationConnection = RunService.RenderStepped:Connect(function(dt)
+    if not Ring.Parent then
+        RingRotationConnection:Disconnect()
+        return
+    end
+
+    RingGradient.Rotation = (RingGradient.Rotation + dt * 180) % 360
+end)
+
+local function tween(object, time, properties, easingStyle, easingDirection)
+    local info = TweenInfo.new(
+        time,
+        easingStyle or Enum.EasingStyle.Quad,
+        easingDirection or Enum.EasingDirection.Out
+    )
+
+    local t = TweenService:Create(object, info, properties)
+    t:Play()
+    return t
+end
+
+Image.Size = UDim2.fromOffset(850, 850)
+Ring.Size = UDim2.fromOffset(1050, 300)
+
+task.wait(0.2)
+
+local ImageShrink = tween(
+    Image,
+    3.2,
+    {
+        Size = UDim2.fromOffset(80, 80)
+    },
+    Enum.EasingStyle.Quint,
+    Enum.EasingDirection.In
+)
+
+local RingShrink = tween(
+    Ring,
+    3.2,
+    {
+        Size = UDim2.fromOffset(110, 35)
+    },
+    Enum.EasingStyle.Quint,
+    Enum.EasingDirection.In
+)
+
+ImageShrink.Completed:Wait()
+
+Image.Visible = false
+Ring.Visible = false
+
+local Flash = Instance.new("Frame")
+Flash.Name = "YellowFlash"
+Flash.Size = UDim2.fromScale(1, 1)
+Flash.BackgroundColor3 = Color3.fromRGB(255, 225, 0)
+Flash.BackgroundTransparency = 1
+Flash.BorderSizePixel = 0
+Flash.ZIndex = 50
+Flash.Parent = Background
+
+local flashIn = tween(
+    Flash,
+    0.08,
+    {
+        BackgroundTransparency = 0
+    },
+    Enum.EasingStyle.Linear
+)
+
+flashIn.Completed:Wait()
+
+local flashOut = tween(
+    Flash,
+    0.45,
+    {
+        BackgroundTransparency = 1
+    },
+    Enum.EasingStyle.Quad,
+    Enum.EasingDirection.Out
+)
+
+flashOut.Completed:Wait()
+
+local LoadingFrame = Instance.new("Frame")
+LoadingFrame.Name = "LoadingFrame"
+LoadingFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+LoadingFrame.Position = UDim2.fromScale(0.5, 0.5)
+LoadingFrame.Size = UDim2.fromOffset(420, 150)
+LoadingFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+LoadingFrame.BackgroundTransparency = 0.05
+LoadingFrame.BorderSizePixel = 0
+LoadingFrame.ZIndex = 60
+LoadingFrame.Parent = Background
+
+local LoadingCorner = Instance.new("UICorner")
+LoadingCorner.CornerRadius = UDim.new(0, 18)
+LoadingCorner.Parent = LoadingFrame
+
+local LoadingStroke = Instance.new("UIStroke")
+LoadingStroke.Thickness = 2
+LoadingStroke.Color = Color3.fromRGB(255, 220, 0)
+LoadingStroke.Transparency = 0.15
+LoadingStroke.Parent = LoadingFrame
+
+local LoadingText = Instance.new("TextLabel")
+LoadingText.Name = "LoadingText"
+LoadingText.AnchorPoint = Vector2.new(0.5, 0.5)
+LoadingText.Position = UDim2.fromScale(0.5, 0.5)
+LoadingText.Size = UDim2.new(1, -30, 1, -30)
+LoadingText.BackgroundTransparency = 1
+LoadingText.Text = "Loading.."
+LoadingText.TextColor3 = Color3.fromRGB(255, 225, 0)
+LoadingText.TextScaled = true
+LoadingText.Font = Enum.Font.GothamBold
+LoadingText.ZIndex = 61
+LoadingText.Parent = LoadingFrame
+
+LoadingFrame.Size = UDim2.fromOffset(0, 0)
+LoadingFrame.BackgroundTransparency = 1
+LoadingStroke.Transparency = 1
+LoadingText.TextTransparency = 1
+
+tween(
+    LoadingFrame,
+    0.45,
+    {
+        Size = UDim2.fromOffset(420, 150),
+        BackgroundTransparency = 0.05
+    },
+    Enum.EasingStyle.Back,
+    Enum.EasingDirection.Out
+)
+
+tween(
+    LoadingStroke,
+    0.35,
+    {
+        Transparency = 0.15
+    },
+    Enum.EasingStyle.Quad,
+    Enum.EasingDirection.Out
+)
+
+tween(
+    LoadingText,
+    0.35,
+    {
+        TextTransparency = 0
+    },
+    Enum.EasingStyle.Quad,
+    Enum.EasingDirection.Out
+)
+
+local found = false
+
+local function CheckForKrystalDance()
+    for _, obj in ipairs(game:GetDescendants()) do
+        if string.lower(obj.Name) == "krystaldance" then
+            return obj
+        end
+    end
+
+    return nil
+end
+
+while not found do
+    local model = CheckForKrystalDance()
+
+    if model then
+        found = true
+        break
+    end
+
+    task.wait(0.15)
+end
+
+task.wait(0.2)
+
+LoadingText.Text = "Loaded omg dance v1.4.0.1"
+
+LoadingText.TextColor3 = Color3.fromRGB(255, 235, 80)
+
+local pulse = tween(
+    LoadingText,
+    0.25,
+    {
+        TextSize = 34
+    },
+    Enum.EasingStyle.Quad,
+    Enum.EasingDirection.Out
+)
+
+task.wait(1.5)
+
+local fadeFrame = tween(
+    LoadingFrame,
+    0.45,
+    {
+        BackgroundTransparency = 1
+    },
+    Enum.EasingStyle.Quad,
+    Enum.EasingDirection.Out
+)
+
+tween(
+    LoadingText,
+    0.45,
+    {
+        TextTransparency = 1
+    },
+    Enum.EasingStyle.Quad,
+    Enum.EasingDirection.Out
+)
+
+tween(
+    LoadingStroke,
+    0.45,
+    {
+        Transparency = 1
+    },
+    Enum.EasingStyle.Quad,
+    Enum.EasingDirection.Out
+)
+
+fadeFrame.Completed:Wait()
+
+if RingRotationConnection then
+    RingRotationConnection:Disconnect()
+end
+
+Gui:Destroy()
